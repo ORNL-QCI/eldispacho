@@ -72,9 +72,9 @@ endif()
 find_package(Boost COMPONENTS system thread program_options date_time REQUIRED)
 link_directories(${Boost_LIBRARY_DIR})
 
-include_directories("${CMAKE_SOURCE_DIR}/")
-include_directories("${CMAKE_SOURCE_DIR}/tpls/cppzmq/")
-include_directories("${CMAKE_SOURCE_DIR}/tpls/rapidjson/include/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/tpls/cppzmq/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/tpls/rapidjson/include/")
 
 message("------------------------------")
 
