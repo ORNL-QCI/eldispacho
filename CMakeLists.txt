@@ -103,4 +103,4 @@ install(TARGETS eldispacho DESTINATION bin)
 ########################################################################
 # UNINSTALL
 ########################################################################
-add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.cmake)
+#add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.cmake)
