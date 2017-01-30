@@ -10,7 +10,7 @@ namespace model {
 	/**
 	 * \brief The types of nodes on the network.
 	 */
-	enum node_type {
+	enum class node_type {
 		/**
 		 * \brief An endpoint can receive quantum transmissions.
 		 */

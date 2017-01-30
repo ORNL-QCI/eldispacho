@@ -5,8 +5,10 @@
 
 /**
  * \brief The actions the dispatcher can perform.
+ * 
+ * \warning Order must correspond to _actions[].
  */
-enum action {
+enum class action {
 	configure_detector,
 	tx,
 	configure_qswitch,
@@ -39,6 +41,8 @@ struct _action {
 
 /**
  * \brief The corresponding metadata for each action enum value.
+ * 
+ * \warning Order must correspond to action.
  */
 constexpr _action _actions[7] = {
 		DECLARE_ACTION("configure_detector"),
@@ -50,7 +54,7 @@ constexpr _action _actions[7] = {
 		DECLARE_ACTION("simulator_response"),
 };
 
-static_assert(sizeof(_actions)/sizeof(_actions[0]) == action::_COUNT,
+static_assert(ARRAY_LENGTH(_actions) == enum_value<action>(action::_COUNT),
 		"Missing element in _actions");
 
 /**
@@ -65,7 +69,7 @@ constexpr const char* action_str(const action A) {
 	}
 	#endif
 	
-	return _actions[A].str;
+	return _actions[enum_value<action>(A)].str;
 }
 
 /**
@@ -80,7 +84,7 @@ constexpr std::size_t action_str_size(const action A) {
 	}
 	#endif
 	
-	return _actions[A].size;
+	return _actions[enum_value<action>(A)].size;
 }
 
 /**

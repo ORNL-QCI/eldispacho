@@ -34,7 +34,7 @@ namespace model {
 		#else
 		#	error Endianness cannot be detected
 		#endif
-		enum chirality {
+		enum class chirality {
 			/**
 			 * \brief Clockwise rotation means nodes are connected in ascending order and
 			 * the last node is connected to the first.

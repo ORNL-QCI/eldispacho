@@ -2,8 +2,20 @@
 #define _COMMON_HPP
 
 #include <common.h>
+#include <type_traits>
 
 //#define THROW
+
+/**
+ * \brief Convert a scoped enum to its underlying type value.
+ * 
+ * Taken from Effective Modern C++ (978-1-491-90399-5)
+ */
+template<typename E>
+		constexpr typename std::underlying_type<E>::type
+		enum_value(E enumerator) noexcept {
+	return static_cast<typename std::underlying_type<E>::type>(enumerator);
+}
 
 /**
  * \brief \todo

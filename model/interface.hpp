@@ -9,7 +9,7 @@ namespace model {
 		/**
 		 * \brief \todo
 		 */
-		enum type {
+		enum class type {
 			rx,
 			tx
 		};
@@ -116,7 +116,7 @@ namespace model {
 		/**
 		 * \brief \todo
 		 */
-		struct transmitter : public base<interface::tx> {
+		struct transmitter : public base<interface::type::tx> {
 		 public:
 			/**
 			 * \brief Null simulation unit constructor takes only an id for the interface.
@@ -143,7 +143,7 @@ namespace model {
 		/**
 		 * \brief \todo
 		 */
-		struct receiver : public base<interface::rx> {
+		struct receiver : public base<interface::type::rx> {
 		 public:
 			/**
 			 * \brief Null simulation unit constructor takes only an id for the interface.

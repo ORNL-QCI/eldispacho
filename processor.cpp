@@ -210,7 +210,7 @@ void processor::work(const std::size_t id, ::simulator::client& client) {
 				 }
 				 default:
 				 {
-					std::cerr << "Unknown action: " << item.action() << std::endl;
+					std::cerr << "Unknown action: " << enum_value<action>(item.action()) << std::endl;
 				 }
 				}
 			}

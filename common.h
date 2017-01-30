@@ -47,4 +47,9 @@
 //#	define RAPIDJSON_SSE2
 #endif
 
+/**
+ * \brief Get the number of elements in an array.
+ */
+#define ARRAY_LENGTH(x) (unsigned)(sizeof(x)/sizeof(x[0]))
+
 #endif
