@@ -24,7 +24,7 @@ namespace model {
 		 */
 		base_node_qswitch(const node::id_t id,
 				const std::size_t portCount)
-				: node(node_type::qswitch, id, portCount) {
+				: node(type_t::qswitch, id, portCount) {
 			nodesOnPorts = new node*[portCount];
 			memset(nodesOnPorts, 0, portCount*sizeof(node*));
 		}

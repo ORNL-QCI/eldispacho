@@ -1,5 +1,5 @@
-#ifndef _MODEL_NODE_HPP
-#define _MODEL_NODE_HPP
+#ifndef _MODEL_NETWORK_NODE_HPP
+#define _MODEL_NETWORK_NODE_HPP
 
 #include <common.hpp>
 #include "adjacency.hpp"
@@ -8,31 +8,32 @@
 
 namespace model {
 	/**
-	 * \brief The types of nodes on the network.
-	 */
-	enum class node_type {
-		/**
-		 * \brief An endpoint can receive quantum transmissions.
-		 */
-		endpoint,
-		
-		/**
-		 * \brief A quantum switch can route quantum transmissions from a node to another
-		 * node.
-		 */
-		qswitch,
-		
-		/**
-		 * \brief A null node drops everything sent to it.
-		 */
-		null
-	};
-	
-	/**
 	 * \brief A node on the network.
 	 */
 	class node {
 	 public:
+		
+		/**
+		 * \brief The types of nodes on the network.
+		 */
+		enum class type_t {
+			/**
+			 * \brief An endpoint can receive quantum transmissions.
+			 */
+			endpoint,
+			
+			/**
+			 * \brief A quantum switch can route quantum transmissions from a node to another
+			 * node.
+			 */
+			qswitch,
+			
+			/**
+			 * \brief A null node drops everything sent to it.
+			 */
+			null
+		};
+		
 		/**
 		 * \brief The node id type.
 		 */
@@ -42,7 +43,7 @@ namespace model {
 		 * \brief Constructor takes the node_type, a numerical id for the node, the
 		 * initial size of the adjacency matrix for the connections the node makes.
 		 */
-		node(const node_type type,
+		node(const type_t type,
 				const id_t id,
 				const std::size_t connectionSize);
 		
@@ -71,7 +72,7 @@ namespace model {
 		/**
 		 * \brief Return the type of node.
 		 */
-		inline node_type type() const {
+		inline type_t type() const {
 			return _type;
 		}
 		
@@ -152,7 +153,7 @@ namespace model {
 		/**
 		 * \brief The type of the node.
 		 */
-		node_type _type;
+		type_t _type;
 		
 		/**
 		 * \brief The id of the node.
@@ -164,6 +165,7 @@ namespace model {
 		 */
 		adjacency<node> _connections;
 	};
+
 }
 
 #endif

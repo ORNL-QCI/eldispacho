@@ -90,7 +90,7 @@ void processor::work(const std::size_t id, ::simulator::client& client) {
 				 case ::action::configure_node:
 				 {
 					switch(item.from().type()) {
-					 case ::model::node_type::endpoint:
+					 case ::model::node::type_t::endpoint:
 					 {
 						auto bne = static_cast<model::base_node_endpoint*>(&item.from());
 						if(strcmp(item.component(), "receiver") == 0) {
@@ -116,7 +116,7 @@ void processor::work(const std::size_t id, ::simulator::client& client) {
 						
 						break; 
 					 }
-					 case ::model::node_type::qswitch:
+					 case ::model::node::type_t::qswitch:
 					 {
 						if(strcmp(item.component(), "routing") == 0) {
 							/** \todo: logging */
@@ -129,7 +129,7 @@ void processor::work(const std::size_t id, ::simulator::client& client) {
 						
 						break;
 					 }
-					 case ::model::node_type::null:
+					 case ::model::node::type_t::null:
 					 {
 						// Null endpoints currently have nothing to configure, so drop
 						
@@ -151,7 +151,7 @@ void processor::work(const std::size_t id, ::simulator::client& client) {
 							endpointNode = incoming;
 						} else {
 							switch(temp.type()) {
-							 case ::model::node_type::qswitch:
+							 case ::model::node::type_t::qswitch:
 							 {
 								lastNode = &temp;
 								 
@@ -162,12 +162,12 @@ void processor::work(const std::size_t id, ::simulator::client& client) {
 								incoming = switchNode.route(incoming);
 								break;
 							 }
-							 case ::model::node_type::endpoint:
+							 case ::model::node::type_t::endpoint:
 							 {
 								endpointNode = &temp;
 								break;
 							 }
-							 case ::model::node_type::null:
+							 case ::model::node::type_t::null:
 							 {
 								 // If the nodetype is null, we break out of the processing
 								 // loop immediately below this
@@ -179,7 +179,7 @@ void processor::work(const std::size_t id, ::simulator::client& client) {
 					} while(endpointNode == 0);
 					
 					// If the endpoint node type is null, we drop the transmission
-					if(endpointNode->type() == ::model::node_type::null) {
+					if(endpointNode->type() == ::model::node::type_t::null) {
 						continue;
 					}
 					auto receivingClient = static_cast<model::base_node_endpoint*>(endpointNode);

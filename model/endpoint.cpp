@@ -4,7 +4,7 @@ namespace model {
 	const node::registry<null_endpoint> null_endpoint::name("null_endpoint");
 	
 	null_endpoint::null_endpoint(const node::id_t id, const std::size_t connectionCount)
-			: node(node_type::null, id, connectionCount) {
+			: node(type_t::null, id, connectionCount) {
 	}
 	
 	null_endpoint::~null_endpoint() {

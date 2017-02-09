@@ -53,7 +53,7 @@ namespace model {
 		base_node_endpoint(const node::id_t id,
 				const std::size_t connectionSize,
 				interface::receiver&& _detector)
-				: node(node_type::endpoint, id, connectionSize),
+				: node(type_t::endpoint, id, connectionSize),
 				_detector(std::move(_detector)) {
 		}
 		

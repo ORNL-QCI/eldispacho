@@ -18,7 +18,7 @@ namespace model {
 		}
 	}
 	
-	node::node(const node_type type,
+	node::node(const type_t type,
 			const id_t id,
 			const std::size_t connectionSize)
 			: _type(type),
@@ -28,4 +28,5 @@ namespace model {
 	
 	node::~node() {
 	}
+
 }
