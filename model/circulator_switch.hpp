@@ -101,7 +101,7 @@ namespace model {
 		/**
 		 * \brief Register node.
 		 */
-		static const node_register<circulator_switch> register_node;
+		static const node::registry<circulator_switch> register_node;
 	 
 		/**
 		 * \brief The current chirality of the switch.

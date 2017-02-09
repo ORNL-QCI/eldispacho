@@ -62,7 +62,7 @@ namespace model {
 					_parse_validate<const char*>(*vitr, "model");
 					_parse_validate<unsigned long int>(*vitr, "id");
 					
-					auto qswitch = node_factory::instantiate((*vitr)["model"].GetString(),
+					auto qswitch = node::factory::instantiate((*vitr)["model"].GetString(),
 							(*vitr)["id"].GetUint64());
 					
 					if((*vitr).HasMember("ports")) {
@@ -79,7 +79,7 @@ namespace model {
 				// Iterate over host objects
 				for(auto vitr = itr->value.Begin(); vitr != itr->value.End(); vitr++) {
 					
-					add_node(node_factory::instantiate("client", vitr->GetUint64()));	
+					add_node(node::factory::instantiate("client", vitr->GetUint64()));	
 				}
 			} else {
 				throw std::invalid_argument(err_msg::_undhcse);

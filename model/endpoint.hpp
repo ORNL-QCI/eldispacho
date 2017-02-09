@@ -32,7 +32,7 @@ namespace model {
 		/**
 		 * \brief Register node.
 		 */
-		static const node_register<null_endpoint> name;
+		static const node::registry<null_endpoint> name;
 	};
 	
 	/**
@@ -109,7 +109,7 @@ namespace model {
 		/**
 		 * \brief Register node.
 		 */
-		static const node_register<client> name;
+		static const node::registry<client> name;
 	};
 }
 

@@ -74,6 +74,71 @@ namespace model {
 		inline node_type type() const {
 			return _type;
 		}
+		
+		/**
+		 * \brief Node factory that contains a list of all registered node types
+		 * that is used to instantiate a new node.
+		 */
+		struct factory {
+		 public:
+			/**
+			 * \brief Function pointer type to create static function.
+			 */
+			using creation_fp_t = node*(*)(const node::id_t);
+			
+			/**
+			 * \brief Node container.
+			 */
+			using node_map_t = std::map<const char* const, creation_fp_t>;
+			
+			/**
+			 * \brief Create a new node type by name with a given id.
+			 */
+			static node* instantiate(const char* const name, const id_t id);
+			
+		 protected:
+			/**
+			 * \brief Direct instantiation is prohibited.
+			 */
+			factory() {
+			}
+			
+			/**
+			 * \brief Create a node of type T with the given id.
+			 */
+			template<typename T>
+					static inline node* create_node(const node::id_t id) {
+				return T::create(id);
+			}
+			
+			/**
+			 * \brief Add a node registry to the list.
+			 */
+			static void add_node(node_map_t::value_type&& o);
+		
+		 private:
+			/**
+			 * \brief List of registered node types.
+			 */
+			static node_map_t _node_map;
+		};
+		
+		/**
+		 * \brief Register a node within the factory.
+		 * 
+		 * A child of node should have a private static const member variable of
+		 * this type with T as their own type and with their name supplied to
+		 * the constructor.
+		 */
+		template<typename T> struct registry : private factory {
+		 public:
+			/**
+			 * \brief Constructor takes the node child's name and registers it.
+			 */
+			registry<T>(const char* const name) {
+				factory::add_node({name, &registry::create_node<T>});
+			}
+		};
 	
 	 protected:
 		/**
@@ -98,73 +163,6 @@ namespace model {
 		 * \brief The connections to other nodes this node has.
 		 */
 		adjacency<node> _connections;
-	};
-	
-	/**
-	 * \brief Create a node of type T with the given id.
-	 */
-	template<typename T> node* create_node(const node::id_t id) {
-		return T::create(id);
-	}
-	
-	/**
-	 * \brief A factory for node types that contains a list of all registered node types
-	 * by name and a static function pointer to each node's create() that overrides
-	 * node::create().
-	 */
-	struct node_factory {
-	 public:
-		/**
-		 * \brief Node container with name and static function pointer to create().
-		 */
-		typedef std::map<const char* const, node*(*)(const node::id_t)> node_map_t;
-		
-		/**
-		 * \brief Create a new node type by name with a given id.
-		 */
-		static node* instantiate(const char* const name, const node::id_t id) {
-			for(auto it : node_map()) {
-				if(strcmp(it.first, name) == 0) {
-					return it.second(id);
-				}
-			}
-			throw std::invalid_argument(err_msg::_tpntfnd);
-		}
-	
-	 protected:
-		/**
-		 * \brief Return reference to list of registered node types.
-		 */
-		static node_map_t& node_map() {
-			return _node_map;
-		}
-	
-	 private:
-		/**
-		 * \brief List of registered node types.
-		 */
-		static node_map_t _node_map;
-	};
-	
-	/**
-	 * \brief Register a node within the factory.
-	 * 
-	 * A child of node should have a private member variable of this type with T as their
-	 * own type with their name supplied to the constructor. This automatically registers
-	 * the node type within the node_factory.
-	 */
-	template<typename T> struct node_register : node_factory {
-	 public:
-		/**
-		 * \brief Constructor takes the node type's name and registers it with the
-		 * node_facotry.
-		 */
-		node_register(const char* const name) {
-			auto it(node_map().insert({name, &create_node<T>}));
-			if(UNLIKELY(!it.second)) {
-				throw std::runtime_error(err_msg::_rgstrfl);
-			}
-		}
 	};
 }
 

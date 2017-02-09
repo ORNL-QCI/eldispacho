@@ -1,7 +1,7 @@
 #include "circulator_switch.hpp"
 
 namespace model {
-	const node_register<circulator_switch> circulator_switch::register_node("circulator_switch");
+	const node::registry<circulator_switch> circulator_switch::register_node("circulator_switch");
 	
 	circulator_switch::circulator_switch(const node::id_t name,
 			const std::size_t portCount)

@@ -1,7 +1,7 @@
 #include "endpoint.hpp"
 
 namespace model {
-	const node_register<null_endpoint> null_endpoint::name("null_endpoint");
+	const node::registry<null_endpoint> null_endpoint::name("null_endpoint");
 	
 	null_endpoint::null_endpoint(const node::id_t id, const std::size_t connectionCount)
 			: node(node_type::null, id, connectionCount) {
@@ -10,7 +10,7 @@ namespace model {
 	null_endpoint::~null_endpoint() {
 	}
 	
-	const node_register<client> client::name("client");
+	const node::registry<client> client::name("client");
 	
 	client::client(const node::id_t id,
 			receiver&& detector,
