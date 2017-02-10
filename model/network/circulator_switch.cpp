@@ -1,6 +1,7 @@
 #include "circulator_switch.hpp"
 
 namespace model {
+namespace network {
 	const node::registry<circulator_switch> circulator_switch::register_node("circulator_switch");
 	
 	circulator_switch::circulator_switch(const node::id_t name,
@@ -72,4 +73,5 @@ namespace model {
 		
 		update_routing_table();*/
 	}
+}
 }

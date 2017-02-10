@@ -90,9 +90,9 @@ void processor::work(const std::size_t id, ::simulator::client& client) {
 				 case ::action::configure_node:
 				 {
 					switch(item.from().type()) {
-					 case ::model::node::type_t::endpoint:
+					 case ::model::network::node::type_t::endpoint:
 					 {
-						auto bne = static_cast<model::base_node_endpoint*>(&item.from());
+						auto bne = static_cast<model::network::base_node_endpoint*>(&item.from());
 						if(strcmp(item.component(), "receiver") == 0) {
 							/** \todo: logging */
 							
@@ -101,7 +101,7 @@ void processor::work(const std::size_t id, ::simulator::client& client) {
 									item.parameter<char>(2),
 									true);
 							
-							auto d = model::base_node_endpoint::receiver(1,
+							auto d = model::network::base_node_endpoint::receiver(1,
 										std::move(simUnit));
 							
 							bne->configure_detector(std::move(d));
@@ -116,12 +116,12 @@ void processor::work(const std::size_t id, ::simulator::client& client) {
 						
 						break; 
 					 }
-					 case ::model::node::type_t::qswitch:
+					 case ::model::network::node::type_t::qswitch:
 					 {
 						if(strcmp(item.component(), "routing") == 0) {
 							/** \todo: logging */
 							
-							static_cast<model::base_node_qswitch*>(&item.from())->
+							static_cast<model::network::base_node_qswitch*>(&item.from())->
 									set_state_str(item.parameter<const char*>(1));
 						} else {
 							throw std::runtime_error(err_msg::_undhcse);
@@ -129,7 +129,7 @@ void processor::work(const std::size_t id, ::simulator::client& client) {
 						
 						break;
 					 }
-					 case ::model::node::type_t::null:
+					 case ::model::network::node::type_t::null:
 					 {
 						// Null endpoints currently have nothing to configure, so drop
 						
@@ -141,33 +141,33 @@ void processor::work(const std::size_t id, ::simulator::client& client) {
 				 case ::action::tx:
 				 {
 					// Traverse the network
-					::model::node* incoming = &item.from();
-					::model::node* endpointNode = 0;
-					::model::node* lastNode = &item.from();
+					::model::network::node* incoming = &item.from();
+					::model::network::node* endpointNode = 0;
+					::model::network::node* lastNode = &item.from();
 					do {
-						::model::node& temp = st.network().find_connecting_node(incoming->id());
+						::model::network::node& temp = st.network().find_connecting_node(incoming->id());
 						// This prevents bouncing between two nodes
 						if(lastNode->id() == temp.id()) {
 							endpointNode = incoming;
 						} else {
 							switch(temp.type()) {
-							 case ::model::node::type_t::qswitch:
+							 case ::model::network::node::type_t::qswitch:
 							 {
 								lastNode = &temp;
 								 
 								// We've encountered a switch
-								auto& switchNode = static_cast<::model::base_node_qswitch&>(temp);
+								auto& switchNode = static_cast<::model::network::base_node_qswitch&>(temp);
 								
 								// Hop from the node going in the switch to the node going out
 								incoming = switchNode.route(incoming);
 								break;
 							 }
-							 case ::model::node::type_t::endpoint:
+							 case ::model::network::node::type_t::endpoint:
 							 {
 								endpointNode = &temp;
 								break;
 							 }
-							 case ::model::node::type_t::null:
+							 case ::model::network::node::type_t::null:
 							 {
 								 // If the nodetype is null, we break out of the processing
 								 // loop immediately below this
@@ -179,10 +179,10 @@ void processor::work(const std::size_t id, ::simulator::client& client) {
 					} while(endpointNode == 0);
 					
 					// If the endpoint node type is null, we drop the transmission
-					if(endpointNode->type() == ::model::node::type_t::null) {
+					if(endpointNode->type() == ::model::network::node::type_t::null) {
 						continue;
 					}
-					auto receivingClient = static_cast<model::base_node_endpoint*>(endpointNode);
+					auto receivingClient = static_cast<model::network::base_node_endpoint*>(endpointNode);
 					// If the endpoint node has no configured detector, we drop the transmission
 					if(receivingClient->get_detector().simulation_unit().description() == 0) {
 						std::cerr << "no detector";

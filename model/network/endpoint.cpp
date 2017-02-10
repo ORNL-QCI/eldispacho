@@ -1,6 +1,7 @@
 #include "endpoint.hpp"
 
 namespace model {
+namespace network {
 	const node::registry<null_endpoint> null_endpoint::name("null_endpoint");
 	
 	null_endpoint::null_endpoint(const node::id_t id, const std::size_t connectionCount)
@@ -19,4 +20,5 @@ namespace model {
 			connectionCount,
 			std::move(detector)) {
 	}
+}
 }

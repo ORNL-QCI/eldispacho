@@ -2,27 +2,30 @@
 #define _MODEL_NETWORK_HPP
 
 #include <common.hpp>
-#include "adjacency.hpp"
+#include "../adjacency.hpp"
 #include "node.hpp"
 #include "endpoint.hpp"
 #include "circulator_switch.hpp"
 #include <rapidjson/document.h>
 
 namespace model {
+namespace network {
 	/**
 	 * \brief \todo
+	 * 
+	 * \FIXME: This rename is temporary.
 	 */
-	class network {
+	class system {
 	 public:
 		/**
 		 * \brief Constructor
 		 */
-		network(const char* const topology);
+		system(const char* const topology);
 		
 		/**
 		 * \brief Destructor.
 		 */
-		~network();
+		~system();
 		
 		/**
 		 * \brief Return a pointer to the node with the given id.
@@ -94,7 +97,7 @@ namespace model {
 	/**
 	 * \brief Validate the existance of a json key and that the value is a string.
 	 */
-	template <> inline void network::_parse_validate<const char*>(
+	template <> inline void system::_parse_validate<const char*>(
 			const ::rapidjson::Value& val,
 			const char* const name) const {
 		_parse_validate_existance(val, name);
@@ -109,7 +112,7 @@ namespace model {
 	 * \brief Validate the existance of a json key and that the value is an unsigned long
 	 * integer.
 	 */
-	template <> inline void network::_parse_validate<unsigned long int>(
+	template <> inline void system::_parse_validate<unsigned long int>(
 			const ::rapidjson::Value& val,
 			const char* const name) const {
 		_parse_validate_existance(val, name);
@@ -119,6 +122,7 @@ namespace model {
 		}
 		#endif
 	}
+}
 }
 
 #endif

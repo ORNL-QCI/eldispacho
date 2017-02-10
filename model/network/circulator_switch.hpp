@@ -1,11 +1,12 @@
-#ifndef _MODEL_CIRCULATOR_SWITCH_HPP
-#define _MODEL_CIRCULATOR_SWITCH_HPP
+#ifndef _MODEL_NETWORK_CIRCULATOR_SWITCH_HPP
+#define _MODEL_NETWORK_CIRCULATOR_SWITCH_HPP
 
 #include <common.hpp>
 #include "qswitch.hpp"
 #include <boost/detail/endian.hpp>
 
 namespace model {
+namespace network {
 	/**
 	 * \brief A circulator switch takes data on an ingress port and moves it to an egress
 	 * port either left or right of the ingress port.
@@ -108,6 +109,7 @@ namespace model {
 		 */
 		chirality _state;
 	};
+}
 }
 
 #endif

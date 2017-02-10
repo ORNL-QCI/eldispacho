@@ -1,14 +1,15 @@
-#ifndef _MODEL_ENDPOINT_HPP
-#define _MODEL_ENDPOINT_HPP
+#ifndef _MODEL_NETWORK_ENDPOINT_HPP
+#define _MODEL_NETWORK_ENDPOINT_HPP
 
 #include <common.hpp>
 #include "node.hpp"
 
 namespace model {
+namespace network {
 	/**
 	 * \brief A null endpoint drops everything sent to it.
 	 */
-	class null_endpoint : public node {
+	class null_endpoint : public network::node {
 	 public:
 		/**
 		 * \brief Constructor takes an id and the number of initial conenctions (which by
@@ -43,7 +44,7 @@ namespace model {
 	 * We do not override node's create() function here as this is treated as a virtual
 	 * class. All children of this class MUST implement a create() function (see node).
 	 */
-	class base_node_endpoint : public node {
+	class base_node_endpoint : public network::node {
 	 public:
 		typedef interface::receiver receiver;
 		
@@ -111,6 +112,7 @@ namespace model {
 		 */
 		static const node::registry<client> name;
 	};
+}
 }
 
 #endif

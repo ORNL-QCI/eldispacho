@@ -5,7 +5,7 @@
 #include "time/simulation_time.hpp"
 #include "time/wall_time.hpp"
 #include "time/functions.hpp"
-#include "network.hpp"
+#include "network/system.hpp"
 
 namespace model {
 	/**
@@ -71,7 +71,7 @@ namespace model {
 		 * 
 		 * \returns A mutable reference to the network state object.
 		 */
-		inline ::model::network& network() {
+		inline ::model::network::system& network() {
 			return _network;
 		}
 	
@@ -89,7 +89,7 @@ namespace model {
 		/**
 		 * \brief The network state object.
 		 */
-		::model::network _network;
+		::model::network::system _network;
 	};
 }
 #endif

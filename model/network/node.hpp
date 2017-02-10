@@ -2,11 +2,12 @@
 #define _MODEL_NETWORK_NODE_HPP
 
 #include <common.hpp>
-#include "adjacency.hpp"
-#include "interface.hpp"
+#include "../adjacency.hpp"
+#include "../interface.hpp"
 #include <map>
 
 namespace model {
+namespace network {
 	/**
 	 * \brief A node on the network.
 	 */
@@ -165,7 +166,7 @@ namespace model {
 		 */
 		adjacency<node> _connections;
 	};
-
+}
 }
 
 #endif

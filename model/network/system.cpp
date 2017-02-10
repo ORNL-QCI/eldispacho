@@ -1,12 +1,13 @@
-#include "network.hpp"
+#include "system.hpp"
 
 namespace model {
-	network::network(const char* const topology)
+namespace network {
+	system::system(const char* const topology)
 			: _nodes(0), _nodeSize(0), _connections(0) {
 		parse_desc(topology);
 	}
 	
-	network::~network() {
+	system::~system() {
 		if(_nodes != 0) {
 			for(std::size_t i = 0; i < _nodeSize; i++) {
 				delete _nodes[i];
@@ -15,7 +16,7 @@ namespace model {
 		}
 	}
 	
-	node& network::find_node(const node::id_t id) {
+	node& system::find_node(const node::id_t id) {
 		for(std::size_t i = 0; i < _nodeSize; i++) {
 			if(_nodes[i]->id() == id) {
 				return *_nodes[i];
@@ -26,7 +27,7 @@ namespace model {
 		throw std::out_of_range("node not found");
 	}
 	
-	node& network::find_connecting_node(const node::id_t id) {
+	node& system::find_connecting_node(const node::id_t id) {
 		for(std::size_t i = 0; i < _nodeSize; i++) {
 			if(_nodes[i]->id() == id) {
 				return *_connections.next_neighbor(i);
@@ -37,7 +38,7 @@ namespace model {
 		throw std::out_of_range("node not found");
 	}
 		
-	void network::parse_desc(const char* const str) {
+	void system::parse_desc(const char* const str) {
 		assert(str != 0);
 		
 		::rapidjson::Document dom;
@@ -105,7 +106,7 @@ namespace model {
 		}
 	}
 	
-	bool network::add_node(node* newNode) {	
+	bool system::add_node(node* newNode) {	
 		// Resize
 		node** newNodes = new node*[_nodeSize+1];
 		memcpy(newNodes, _nodes, _nodeSize*sizeof(node*));
@@ -120,7 +121,7 @@ namespace model {
 		return true;
 	}
 	
-	void network::add_connection(const node::id_t a,
+	void system::add_connection(const node::id_t a,
 			const node::id_t b,
 			const bool bidirectional) {
 		std::size_t aIndex = 0;
@@ -153,4 +154,5 @@ namespace model {
 			_connections.add<false>(bIndex, aIndex, _nodes[aIndex]);
 		}
 	}
+}
 }

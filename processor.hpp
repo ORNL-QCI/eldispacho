@@ -4,7 +4,7 @@
 #include <common.hpp>
 #include "action.hpp"
 #include "diagnostics/logger.hpp"
-#include "model/network.hpp"
+#include "model/network/system.hpp"
 #include "model/state.hpp"
 #include "simulator/adapter.hpp"
 #include "simulator/client_pool.hpp"
@@ -88,7 +88,7 @@ class processor {
 	 * If a client is not found then an exception is thrown.
 	 */
 	interpreted_request preprocess(const action type,
-			const ::model::node::id_t from,
+			const ::model::network::node::id_t from,
 			const char* const component,
 			const char* const dialect,
 			const char* const circuit,

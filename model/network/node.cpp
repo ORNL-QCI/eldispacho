@@ -1,6 +1,7 @@
 #include "node.hpp"
 
 namespace model {
+namespace network {
 	node::factory::node_map_t node::factory::_node_map;
 	
 	node* node::factory::instantiate(const char* const name, const id_t id) {
@@ -28,5 +29,5 @@ namespace model {
 	
 	node::~node() {
 	}
-
+}
 }

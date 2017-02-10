@@ -16,11 +16,11 @@ set(eldispacho_sources
 	simulator/client.cpp
 	simulator/client_pool.cpp
 	model/interface.cpp
-	model/node.cpp
-	model/endpoint.cpp
-	model/qswitch.cpp
-	model/circulator_switch.cpp
-	model/network.cpp
+	model/network/node.cpp
+	model/network/endpoint.cpp
+	model/network/qswitch.cpp
+	model/network/circulator_switch.cpp
+	model/network/system.cpp
 	net/server.cpp
 	processor.cpp
 	diagnostics/logger.cpp

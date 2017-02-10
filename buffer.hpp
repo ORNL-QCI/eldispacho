@@ -10,6 +10,8 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
+namespace model { namespace network { class node; } }
+
 /**
  * \brief A message to be pushed over a zmq publisher.
  */
@@ -120,7 +122,7 @@ struct interpreted_request {
 	 * \brief Constructor.
 	 */
 	interpreted_request(::action type,
-			::model::node& from,
+			::model::network::node& from,
 			const char* component,
 			const char* dialect, const char* circuit, const char lineDelimiter,
 			const std::uint_fast64_t txTimestamp)
@@ -141,7 +143,7 @@ struct interpreted_request {
 	/**
 	 * \brief \todo Documentation.
 	 */
-	inline ::model::node& from() const {
+	inline ::model::network::node& from() const {
 		return _from;
 	}
 	
@@ -163,7 +165,7 @@ struct interpreted_request {
 
  private:
 	::action _type;
-	::model::node& _from;
+	::model::network::node& _from;
 	std::string _component;
 	std::vector<std::string> _parameters;
 	std::uint_fast64_t _txTimestamp;

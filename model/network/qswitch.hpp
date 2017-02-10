@@ -1,10 +1,11 @@
-#ifndef _MODEL_QSWITCH_HPP
-#define _MODEL_QSWITCH_HPP
+#ifndef _MODEL_NETWORK_QSWITCH_HPP
+#define _MODEL_NETWORK_QSWITCH_HPP
 
 #include <common.hpp>
 #include "node.hpp"
 
 namespace model {
+namespace network {
 	/**
 	 * \brief Base class for qswitch node.
 	 * 
@@ -93,6 +94,7 @@ namespace model {
 		 */
 		node** nodesOnPorts;
 	};
+}
 }
 
 #endif

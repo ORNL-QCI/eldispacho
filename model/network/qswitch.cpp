@@ -1,6 +1,7 @@
 #include "qswitch.hpp"
 
 namespace model {
+namespace network {
 	void base_node_qswitch::resize(const std::size_t newSize) {
 		if(newSize != size()) {
 			auto tempNodesOnPorts = new node*[newSize];
@@ -64,4 +65,5 @@ namespace model {
 		
 		return 0;
 	}
+}
 }
