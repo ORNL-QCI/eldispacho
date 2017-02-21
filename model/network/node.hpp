@@ -2,20 +2,36 @@
 #define _MODEL_NETWORK_NODE_HPP
 
 #include <common.hpp>
-#include "../adjacency.hpp"
 #include "../interface.hpp"
 #include <map>
+#include <vector>
+#include <boost/thread/mutex.hpp>
+
+// Forward declarations
+class processor;
 
 namespace model {
 namespace network {
+	// Forward declarations
+	class system;
+	class debugger;
+	
 	/**
 	 * \brief A node on the network.
 	 */
 	class node {
-	 public:
+		// Allow debugger to examine class internals
+		friend debugger;
 		
+		/** \fixme: temporary */
+		friend system;
+		friend processor;
+		
+	 public:
 		/**
 		 * \brief The types of nodes on the network.
+		 * 
+		 * \note There is a 1-1 correspondence of values with type_t_str().
 		 */
 		enum class type_t {
 			/**
@@ -36,27 +52,42 @@ namespace network {
 		};
 		
 		/**
+		 * \brief Return a string version of the given type_t type.
+		 */
+		static const char* type_t_str(const type_t type) {
+			switch(type) {
+			 case type_t::endpoint:
+				return "endpoint";
+			 case type_t::qswitch:
+				return "qswitch";
+			 case type_t::null:
+				return "null";
+			}
+			throw std::logic_error(err_msg::_unrchcd);
+		}
+		
+		/**
 		 * \brief The node id type.
 		 */
 		typedef std::uint_fast64_t id_t;
 		
 		/**
-		 * \brief Constructor takes the node_type, a numerical id for the node, the
-		 * initial size of the adjacency matrix for the connections the node makes.
+		 * \brief Constructor.
 		 */
 		node(const type_t type,
-				const id_t id,
-				const std::size_t connectionSize);
+				const id_t id);
 		
 		/**
 		 * \brief Virtual destructor.
+		 * 
+		 * \todo Threadsafety.
 		 */
 		virtual ~node();
 		
 		/**
 		 * \brief Initialize a new instance of the node.
 		 * 
-		 * We must override and implement this in a child.
+		 * \warning We must override and implement this in a child.
 		 */
 		static node* create(const id_t id) {
 			UNUSED(id);
@@ -66,16 +97,107 @@ namespace network {
 		/**
 		 * \brief Return the node id.
 		 */
-		inline id_t id() const {
+		inline id_t id() const noexcept {
 			return _id;
 		}
 		
 		/**
 		 * \brief Return the type of node.
 		 */
-		inline type_t type() const {
+		inline type_t type() const noexcept {
 			return _type;
 		}
+		
+		/**
+		 * \brief The number of children this node has.
+		 * 
+		 * \todo Threadsafety.
+		 */
+		inline id_t child_count() {
+			return _children.size();
+		}
+		
+		/**
+		 * \brief The number of children related to this node.
+		 * 
+		 * \warning This has no depth limiting.
+		 * 
+		 * \todo Threadsafety
+		 */
+		inline id_t recursive_child_count() {
+			id_t sum = _children.size();
+			for(auto child : _children) {
+				sum += child->recursive_child_count();
+			}
+			return sum;
+		}
+		
+		/**
+		 * \brief Add a child node to this node.
+		 * 
+		 * This node will now have responsibility of deallocating the child.
+		 * 
+		 * \TODO Threadsafety.
+		 * 
+		 * \returns False if the child argument has the same memory address as
+		 * an existing child or has the same id as an existing child. Returns
+		 * true otherwise.
+		 */
+		bool add_child(node& child);
+		
+		/**
+		 * \brief Remove a child node from this node.
+		 * 
+		 * Deallocates the child.
+		 * 
+		 * \todo Threadsafety.
+		 * 
+		 * \returns False if the node is not a child.
+		 */
+		bool remove_child(const id_t child);
+		
+		/**
+		 * \brief Determine whether the given node is a child of this node.
+		 * 
+		 * \todo Threadsafety.
+		 */
+		bool is_child(const id_t child);
+		
+		/**
+		 * \brief Return the number of connections this node has.
+		 * 
+		 * \todo Threadsafety.
+		 */
+		inline std::uint_fast64_t connection_count() {
+			return _connections.size();
+		}
+		
+		/**
+		 * \brief Add a connection between another node and this node.
+		 * 
+		 * \todo Threadsafety.
+		 * 
+		 * \returns False if the node is already connected to this node. Returns
+		 * true otherwise.
+		 */
+		bool add_connection(node& other);
+		
+		/**
+		 * \brief Remove a connection between another node and this node.
+		 * 
+		 * \todo Threadsafety.
+		 * 
+		 * \returns False if the other node is not connectioned to this node.
+		 * Returns true otherwise.
+		 */
+		bool remove_connection(const id_t other);
+		
+		/**
+		 * \brief Determine whether the given node is connected to this node.
+		 * 
+		 * \todo Threadsafety.
+		 */
+		bool is_connected(const id_t other);
 		
 		/**
 		 * \brief Node factory that contains a list of all registered node types
@@ -96,14 +218,14 @@ namespace network {
 			/**
 			 * \brief Create a new node type by name with a given id.
 			 */
-			static node* instantiate(const char* const name, const id_t id);
+			static node* instantiate(const char* const name,
+					const node::id_t id);
 			
 		 protected:
 			/**
 			 * \brief Direct instantiation is prohibited.
 			 */
-			factory() {
-			}
+			factory() = default;
 			
 			/**
 			 * \brief Create a node of type T with the given id.
@@ -117,7 +239,7 @@ namespace network {
 			 * \brief Add a node registry to the list.
 			 */
 			static void add_node(node_map_t::value_type&& o);
-		
+			
 		 private:
 			/**
 			 * \brief List of registered node types.
@@ -125,6 +247,7 @@ namespace network {
 			static node_map_t _node_map;
 		};
 		
+	 protected:
 		/**
 		 * \brief Register a node within the factory.
 		 * 
@@ -141,16 +264,50 @@ namespace network {
 				factory::add_node({name, &registry::create_node<T>});
 			}
 		};
-	
-	 protected:
+		
 		/**
-		 * \brief Return a mutable reference to the adjacency object of this node.
+		 * \brief Return a mutable reference to the child list.
+		 * 
+		 * \warning Does not enforce any threadsafety.
 		 */
-		inline adjacency<node>& connections() {
+		inline std::vector<node*>& children() noexcept {
+			return _children;
+		}
+		
+		/**
+		 * \brief Return a mutable reference to the connections list.
+		 * 
+		 * \warning Does not enforce any threadsafety.
+		 */
+		inline std::vector<node*>& connections() noexcept {
 			return _connections;
 		}
-	
+		
+		/**
+		 * \brief Get a child node with the given id.
+		 * 
+		 * \todo Threadsafety.
+		 * 
+		 * \returns Null if no node with given id is a child.
+		 */
+		node* get_child(const id_t id);
+		
+		/**
+		 * \brief Return the name of the implemented node type.
+		 */
+		virtual const char* name() const noexcept = 0;
+		
 	 private:
+		/**
+		 * \brief The default size of the child container.
+		 */
+		constexpr static const std::size_t children_default_size = 3;
+		
+		/**
+		 * \brief The default size of the connection container.
+		 */
+		constexpr static const std::size_t connections_default_size = 3;
+		
 		/**
 		 * \brief The type of the node.
 		 */
@@ -162,9 +319,19 @@ namespace network {
 		id_t _id;
 		
 		/**
-		 * \brief The connections to other nodes this node has.
+		 * \brief List of children this node owns.
+		 * 
+		 * Upon destruction of this node, all children get destroyed.
 		 */
-		adjacency<node> _connections;
+		std::vector<node*> _children;
+		
+		/**
+		 * \brief The connections to other nodes this node has.
+		 * 
+		 * Upon destruction of this node, all connections get destroyed.
+		 */
+		std::vector<node*> _connections;
+		
 	};
 }
 }

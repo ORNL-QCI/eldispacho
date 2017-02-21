@@ -29,6 +29,7 @@ namespace err_msg {
 	const char _undhcse[] = "unhandled case";
 	const char _zrlngth[] = "zero length";
 	const char _badtype[] = "bad type";
+	const char _unrchcd[] = "unreachable code reached";
 }
 
 #endif

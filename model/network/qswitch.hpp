@@ -6,93 +6,122 @@
 
 namespace model {
 namespace network {
+	// Forward declarations
+	class debugger;
+	
 	/**
-	 * \brief Base class for qswitch node.
+	 * \brief A quantum switch which establishes manages connected nodes with
+	 * some specific mechanism.
 	 * 
-	 * These nodes having routing functions. We store a list of ports and nodes connected
-	 * on these ports in this base class, however we do not alter the adjacency matrix
-	 * here, as that is up to the implementing class to decide how ports get routed.
-	 * 
-	 * We do not override node's create() function here as this is treated as a virtual
-	 * class. All children of this class MUST implement a create() function (see node).
-	 * 
-	 * All ports are zero indexed.
+	 * \note All ports are zero indexed.
 	 */
-	class base_node_qswitch : public node {
+	class qswitch : public node {
+		// Allow debugger to examine class internals
+		friend debugger;
+		
 	 public:
 		/**
-		 * \brief Constructor takes an id and a port count.
+		 * \brief The port id type.
 		 */
-		base_node_qswitch(const node::id_t id,
-				const std::size_t portCount)
-				: node(type_t::qswitch, id, portCount) {
-			nodesOnPorts = new node*[portCount];
-			memset(nodesOnPorts, 0, portCount*sizeof(node*));
-		}
+		using port_id_t = std::uint_fast64_t;
+		
+		/**
+		 * \brief Constructor.
+		 */
+		qswitch(const node::id_t id, const port_id_t portCount);
 		
 		/**
 		 * \brief Virtual destructor.
 		 */
-		virtual ~base_node_qswitch() {
-		}
+		virtual ~qswitch();
 		
 		/**
 		 * \brief The size of the switch is the number of ports of the switch.
 		 * 
-		 * This corresponds to the maximum number of connections.
+		 * This corresponds to the maximum number of connections and may or may
+		 * not be equal to the current number of connections.
+		 * 
+		 * \todo Threadsafety.
 		 */
-		inline std::size_t size() {
-			return connections().size();
+		inline port_id_t port_count() {
+			return _ports.size();
 		}
 		
 		/**
-		 * \brief Resize the switch, i.e. add or remove ports.
+		 * \brief Resize the switch.
 		 * 
-		 * If expanding, the extra ports aren't connected to anything. If shrinking, all
-		 * ports beyond the new size are dropped and the adjacency table is shrunk.
+		 * If expanding, the extra ports aren't connected to anything. If
+		 * shrinking, all ports beyond the new size are dropped. The connection
+		 * list is updated accordingly.
+		 * 
+		 * \todo threadsafety
 		 */
-		void resize(const std::size_t newSize);
+		void resize(const port_id_t newSize);
 		
 		/**
-		 * \brief Connect a node to an empty port without updating the routing table.
+		 * \brief Connect a node already in the connection list to a specific
+		 * port.
 		 * 
-		 * If there is already a node connected on the port, return false. Otherwise,
-		 * return true. This calls update_routing_table().
+		 * If the port connection cannot be made successfully, the call is
+		 * idempotent. If it does complete successfully, additional calls with
+		 * identical parameters will fail.
+		 * 
+		 * \note Requires other node already to be connected.
+		 * 
+		 * \todo Threadsafety.
+		 * 
+		 * \returns True if node has been successfully connected to the port,
+		 * false otherwise.
 		 */
-		bool connect_node(const std::size_t port, node* const newNode);
+		bool connect_port(const port_id_t port, const node::id_t newNode);
 		
 		/**
-		 * \brief Disconnect a node from a port without updating the routing table.
+		 * \brief Disconnect a node already in the connection list from a
+		 * specific port.
 		 * 
-		 * If there is no node connected on the port, return false. Otherwise, return
-		 * true.
+		 * Does not remove corresponding node from the connection list.
+		 * 
+		 * \todo Threadsafety.
+		 * 
+		 * \returns True if node has been successfully disconnected from the
+		 * port, false otherwise.
 		 */
-		bool disconnect_node(const std::size_t port);
+		bool disconnect_port(const port_id_t port);
 		
 		/**
-		 * \brief Given an ingress node, return an egress node based on the routing table.
+		 * \brief Find the node connected to the incoming node through the
+		 * routing mechanism.
 		 * 
-		 * Returns 0 if the supplied incoming node is not connected to the switch.
+		 * \todo Threadsafety.
+		 * 
+		 * \returns Null if the route cannot be made. Otherwise return a pointer
+		 * to the connected node,
 		 */
-		node* route(const node* const incoming);
-		
-		/**
-		 * \brief Update the routing table based upon the current (implementation defined)
-		 * state of the switch.
-		 */
-		virtual void update_routing_table() = 0;
+		node* route(node& incoming) noexcept;
 		
 		/**
 		 * \brief Set the state of the switch from a string.
 		 */
 		virtual void set_state_str(const char* const str) = 0;
-	
+		
 	 protected:
 		/**
-		 * \brief A list of nodes connected on each port, which the implementing class'
-		 * routing table can use.
+		 * \brief A list of nodes connected on each port.
+		 * 
+		 * \note Null entries correspond to an unused port.
 		 */
-		node** nodesOnPorts;
+		std::vector<node*> _ports;
+		
+		/**
+		 * \brief Update the internal mechanism used for routing between ports.
+		 */
+		virtual void update_routing_table() = 0;
+		
+	 private:
+		/**
+		 * \brief Route from an ingress port to an egress port.
+		 */
+		virtual port_id_t _route(const port_id_t ingress) = 0;
 	};
 }
 }

@@ -1,4 +1,6 @@
 #include "processor.hpp"
+#include "model/network/endpoint.hpp"
+#include "model/network/qswitch.hpp"
 
 processor::processor(::diagnostics::logger* const logger,
 		const char* const simulatorEndpoint,
@@ -94,7 +96,7 @@ void processor::work(const std::size_t id, ::simulator::client& client) {
 					 {
 						auto bne = static_cast<model::network::base_node_endpoint*>(&item.from());
 						if(strcmp(item.component(), "receiver") == 0) {
-							/** \todo: logging */
+							// \todo: logging 
 							
 							auto simUnit = ::simulator::unit(item.parameter<const char*>(0),
 									item.parameter<const char*>(1),
@@ -108,7 +110,7 @@ void processor::work(const std::size_t id, ::simulator::client& client) {
 							
 							break;
 						} else if(strcmp(item.component(), "transmitter") == 0) {
-							/** \todo: logging */
+						
 							
 						} else {
 							throw std::runtime_error(err_msg::_undhcse);
@@ -119,9 +121,9 @@ void processor::work(const std::size_t id, ::simulator::client& client) {
 					 case ::model::network::node::type_t::qswitch:
 					 {
 						if(strcmp(item.component(), "routing") == 0) {
-							/** \todo: logging */
+				
 							
-							static_cast<model::network::base_node_qswitch*>(&item.from())->
+							static_cast<model::network::qswitch*>(&item.from())->
 									set_state_str(item.parameter<const char*>(1));
 						} else {
 							throw std::runtime_error(err_msg::_undhcse);
@@ -141,48 +143,48 @@ void processor::work(const std::size_t id, ::simulator::client& client) {
 				 case ::action::tx:
 				 {
 					// Traverse the network
-					::model::network::node* incoming = &item.from();
-					::model::network::node* endpointNode = 0;
+					
+					// The node where the transmission is currently
+					::model::network::node* currentNode = &item.from();
+					
+					// The node where the transmission ends up
+					::model::network::node* endNode = nullptr;
+					
+					// The node where the transsmission was last.
+					// Used to prevent bouncing between nodes
 					::model::network::node* lastNode = &item.from();
+					
+					// Loop through the network until an endpoint is reached
 					do {
-						::model::network::node& temp = st.network().find_connecting_node(incoming->id());
-						// This prevents bouncing between two nodes
-						if(lastNode->id() == temp.id()) {
-							endpointNode = incoming;
-						} else {
-							switch(temp.type()) {
-							 case ::model::network::node::type_t::qswitch:
-							 {
-								lastNode = &temp;
-								 
-								// We've encountered a switch
-								auto& switchNode = static_cast<::model::network::base_node_qswitch&>(temp);
-								
-								// Hop from the node going in the switch to the node going out
-								incoming = switchNode.route(incoming);
-								break;
-							 }
-							 case ::model::network::node::type_t::endpoint:
-							 {
-								endpointNode = &temp;
-								break;
-							 }
-							 case ::model::network::node::type_t::null:
-							 {
-								 // If the nodetype is null, we break out of the processing
-								 // loop immediately below this
-								 endpointNode = &temp;
-								 break;
-							 }
-							}
+						// From start node look to connected node
+						
+						/** \fixme In theory there should only be one other
+						 * connected node, unless it is a switch */
+						if(currentNode->connections().size() == 1 &&
+								currentNode == currentNode->connections()[0]) {
+							// Something terrible is happening
+							throw std::runtime_error("Caught network trap!");
 						}
-					} while(endpointNode == 0);
+						
+						/** \fixme I don't think this is always true! */
+						if(currentNode->connections().size() == 1 &&
+								lastNode == currentNode->connections()[0]) {
+							// Reached an endpoint
+							endNode = currentNode;
+							break; // ==continue;
+						}
+						
+						// Probably some sort of switch
+						assert(currentNode->connections().size() > 1);
+						lastNode = currentNode;
+						currentNode = static_cast<model::network::qswitch*>(currentNode)->route(*lastNode);
+					} while(endNode == nullptr);
 					
 					// If the endpoint node type is null, we drop the transmission
-					if(endpointNode->type() == ::model::network::node::type_t::null) {
+					if(endNode->type() == ::model::network::node::type_t::null) {
 						continue;
 					}
-					auto receivingClient = static_cast<model::network::base_node_endpoint*>(endpointNode);
+					auto receivingClient = static_cast<model::network::base_node_endpoint*>(endNode);
 					// If the endpoint node has no configured detector, we drop the transmission
 					if(receivingClient->get_detector().simulation_unit().description() == 0) {
 						std::cerr << "no detector";
@@ -190,9 +192,9 @@ void processor::work(const std::size_t id, ::simulator::client& client) {
 					}
 					
 					// Our simulation circuit description
-					/** \todo: this has some problems, especially if incoming and outgoing circuit
-					 * is of different dialect or line delimiter
-					 */
+					// \todo: this has some problems, especially if incoming and outgoing circuit
+					//is of different dialect or line delimiter
+					 
 					std::string circuit = std::string(item.parameter<const char*>(1)) + std::string("\n") +
 							std::string(receivingClient->get_detector().simulation_unit().description());
 					

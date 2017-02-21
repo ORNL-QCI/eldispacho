@@ -20,7 +20,9 @@ set(eldispacho_sources
 	model/network/endpoint.cpp
 	model/network/qswitch.cpp
 	model/network/circulator_switch.cpp
+	model/network/parser.cpp
 	model/network/system.cpp
+	model/network/debugger.cpp
 	net/server.cpp
 	processor.cpp
 	diagnostics/logger.cpp
@@ -32,6 +34,9 @@ set(eldispacho_sources
 ########################################################################
 message("------------------------------")
 message("Build Configuration:")
+
+# This breaks valgrind because who knows
+# -msse4.2
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-long-long -pedantic")

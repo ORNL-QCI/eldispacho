@@ -2,23 +2,11 @@
 
 namespace model {
 namespace network {
-	const node::registry<null_endpoint> null_endpoint::name("null_endpoint");
-	
-	null_endpoint::null_endpoint(const node::id_t id, const std::size_t connectionCount)
-			: node(type_t::null, id, connectionCount) {
-	}
-	
-	null_endpoint::~null_endpoint() {
-	}
-	
-	const node::registry<client> client::name("client");
+	const node::registry<client> client::register_node(_name);
 	
 	client::client(const node::id_t id,
-			receiver&& detector,
-			const std::size_t connectionCount)
-			: base_node_endpoint(id,
-			connectionCount,
-			std::move(detector)) {
+			receiver&& detector)
+			: base_node_endpoint(id, std::move(detector)) {
 	}
 }
 }

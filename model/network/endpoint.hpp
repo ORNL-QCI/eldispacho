@@ -5,37 +5,7 @@
 #include "node.hpp"
 
 namespace model {
-namespace network {
-	/**
-	 * \brief A null endpoint drops everything sent to it.
-	 */
-	class null_endpoint : public network::node {
-	 public:
-		/**
-		 * \brief Constructor takes an id and the number of initial conenctions (which by
-		 * default is 0).
-		 */
-		null_endpoint(const node::id_t id, const std::size_t connectionCount = 0);
-		
-		/**
-		 * \brief Virtual destructor.
-		 */
-		virtual ~null_endpoint();
-		
-		/**
-		 * \brief Initialize a new instance of the class.
-		 */
-		static node* create(const node::id_t id) {
-			return new null_endpoint(id, 0);
-		}
-	
-	 private:
-		/**
-		 * \brief Register node.
-		 */
-		static const node::registry<null_endpoint> name;
-	};
-	
+namespace network {	
 	/**
 	 * \brief Base class for endpoint nodes.
 	 * 
@@ -52,9 +22,8 @@ namespace network {
 		 * \brief Constructor takes an id, number of connections, and detector.
 		 */
 		base_node_endpoint(const node::id_t id,
-				const std::size_t connectionSize,
 				interface::receiver&& _detector)
-				: node(type_t::endpoint, id, connectionSize),
+				: node(type_t::endpoint, id),
 				_detector(std::move(_detector)) {
 		}
 		
@@ -63,7 +32,7 @@ namespace network {
 		 */
 		virtual ~base_node_endpoint() {
 		}
-				
+		
 		/**
 		 * \brief Return a non-mutable reference to the detector.
 		 */
@@ -77,7 +46,7 @@ namespace network {
 		inline void configure_detector(receiver&& newDetector) {
 			_detector = std::move(newDetector);
 		}
-	
+		
 	 private:
 		/**
 		 * \brief The detector.
@@ -96,21 +65,30 @@ namespace network {
 		 * initial number of connections (which is by default 0).
 		 */
 		client(const node::id_t id,
-				receiver&& detector,
-				const std::size_t connectionCount = 0);
+				receiver&& detector);
 		
 		/**
 		 * \brief Initialize a new instance of the class.
 		 */
 		static node* create(const node::id_t id) {
-			return new client(id, receiver(1), 0);
+			return new client(id, receiver(1));
 		}
-	
+		
+	 protected:
+		/**
+		 * \brief \TODO
+		 */
+		inline const char* name() const noexcept {
+			return _name;
+		}
+		
 	 private:
 		/**
 		 * \brief Register node.
 		 */
-		static const node::registry<client> name;
+		static const node::registry<client> register_node;
+		
+		static constexpr const char* const _name = "client";
 	};
 }
 }

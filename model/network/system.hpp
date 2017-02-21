@@ -1,22 +1,24 @@
-#ifndef _MODEL_NETWORK_HPP
-#define _MODEL_NETWORK_HPP
+#ifndef _MODEL_NETWORK_SYSTEM_HPP
+#define _MODEL_NETWORK_SYSTEM_HPP
 
 #include <common.hpp>
-#include "../adjacency.hpp"
 #include "node.hpp"
-#include "endpoint.hpp"
-#include "circulator_switch.hpp"
-#include <rapidjson/document.h>
+#include <map>
 
 namespace model {
 namespace network {
 	/**
 	 * \brief \todo
-	 * 
-	 * \FIXME: This rename is temporary.
 	 */
-	class system {
+	class system : public node{
+		friend debugger;
+		
 	 public:
+		/**
+		 * \brief \todo
+		 */
+		using node_list_t = std::map<node::id_t, node*>;
+		
 		/**
 		 * \brief Constructor
 		 */
@@ -35,93 +37,23 @@ namespace network {
 		node& find_node(const node::id_t id);
 		
 		/**
-		 * \brief Return a pointer to the next neighbor connected to a node.
-		 * 
-		 * \throws std::out_of_range if node with the given id is not found.
+		 * \brief Return the name of the implementation type.
 		 */
-		node& find_connecting_node(const node::id_t id);
+		virtual inline const char* name() const noexcept {
+			return "system";
+		}
 	
 	 private:
-	 	node** _nodes;
-		std::size_t _nodeSize;
-		
-		adjacency<node> _connections;
-		
 		/**
-		 * \brief
-		 */
-		void parse_desc(const char* const str);
-		
-		/**
-		 * \brief Add a node to the network.
-		 */
-		bool add_node(node* newNode);
-		
-		/**
-		 * \brief Add a connection between two nodes.
+		 * \brief A sorted node list for efficient lookup when preprocessing.
 		 * 
-		 * The bidirectional flag adds a connection from a |-> b and b |-> a if true and
-		 * only adds a connection from a |-> b if false.
-		 * 
-		 * \throws std::out_of_range if either of given ids do not correspond to nodes.
+		 * \todo This may not be the fastest container to use. Although the
+		 * complexity may be log_2(n), testing with sorted vectors and sets
+		 * seems to suggest that maps are most costly to interact with in
+		 * general.
 		 */
-		void add_connection(const node::id_t a,
-				const node::id_t b,
-				const bool bidirectional = true);
-		
-		/**
-		 * \brief Validate the existance of a json key within an object.
-		 */
-		inline void _parse_validate_existance(const ::rapidjson::Value& val,
-				const char* const name) const {
-			#ifdef THROW
-			if(UNLIKELY(name == 0)) {
-				throw std::invalid_argument(err_msg::_nllpntr);
-			}
-			if(UNLIKELY(!val.HasMember(name))) {
-				throw std::invalid_argument(err_msg::_tpntfnd);
-			}
-			#endif
-			UNUSED(val);
-			UNUSED(name);
-		}
-		
-		/**
-		 * \brief Validate both the existance of a json key and the value type T within an
-		 * object.
-		 */
-		template <typename T> inline void _parse_validate(const ::rapidjson::Value& val,
-				const char* const name) const;
+		node_list_t _nodeList;
 	};
-	
-	/**
-	 * \brief Validate the existance of a json key and that the value is a string.
-	 */
-	template <> inline void system::_parse_validate<const char*>(
-			const ::rapidjson::Value& val,
-			const char* const name) const {
-		_parse_validate_existance(val, name);
-		#ifdef THROW
-		if(UNLIKELY(!val[name].IsString())) {
-			throw std::invalid_argument(err_msg::_badtype);
-		}
-		#endif
-	}
-	
-	/**
-	 * \brief Validate the existance of a json key and that the value is an unsigned long
-	 * integer.
-	 */
-	template <> inline void system::_parse_validate<unsigned long int>(
-			const ::rapidjson::Value& val,
-			const char* const name) const {
-		_parse_validate_existance(val, name);
-		#ifdef THROW
-		if(UNLIKELY(!val[name].IsUint64())) {
-			throw std::invalid_argument(err_msg::_badtype);
-		}
-		#endif
-	}
 }
 }
 
