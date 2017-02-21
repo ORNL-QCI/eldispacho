@@ -1,0 +1,49 @@
+{
+	"nodes" : [
+		{
+			"id" : 1,
+			"model" : "circulator_switch",
+			"portCount" : 3,
+			"ports" : [
+				2,
+				3,
+				4
+			]
+		},
+		{
+			"id" : 2,
+			"model" : "client",
+			"nodes" : [
+				{
+					"id" : 5,
+					"model" : "client",
+					"nodes" : [
+						{
+							"id" : 6,
+							"model" : "client"
+						}
+					]
+				}			
+			]
+		},
+		{
+			"id" : 3,
+			"model" : "client"
+		},
+		{
+			"id" : 4,
+			"model" : "client"
+		}
+	],
+	"connections" : [
+		{
+			"endpoints" : [1,2]
+		},
+		{
+			"endpoints" : [1,3]
+		},
+		{
+			"endpoints" : [1,4]
+		}
+	]
+}
