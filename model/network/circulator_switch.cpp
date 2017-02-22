@@ -37,10 +37,10 @@ namespace network {
 			circulator_switch::_route(const qswitch::port_id_t ingress) {
 		switch(_state) {
 		 case chirality::ccw:
-			if(ingress == 0) return _ports.size();
+			if(ingress == 0) return _ports.size() - 1;
 			else return ingress - 1;
 		 case chirality::cw:
-			if(ingress == _ports.size()) return 0;
+			if(ingress + 1 == _ports.size()) return 0;
 			else return ingress + 1;
 		}
 		throw std::logic_error(err_msg::_unrchcd);
