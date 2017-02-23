@@ -61,7 +61,12 @@ namespace network {
 	node* qswitch::route(node& incoming) noexcept {
 		const port_id_t size = _ports.size();
 		for(port_id_t i = 0; i < size; i++) {
-			if(_ports[i] == &incoming) return _ports[_route(i)];
+			if(_ports[i] == &incoming) {
+				/** \fixme If we were more trusting we could remove this... */
+				const port_id_t port = _route(i);
+				if(port >= size) throw std::logic_error(err_msg::_arybnds);
+				return _ports[port];
+			}
 		}
 		return nullptr;
 	}
