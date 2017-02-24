@@ -156,28 +156,27 @@ void processor::work(const std::size_t id, ::simulator::client& client) {
 					
 					// Loop through the network until an endpoint is reached
 					do {
-						// From start node look to connected node
-						
-						/** \fixme In theory there should only be one other
-						 * connected node, unless it is a switch */
-						if(currentNode->connections().size() == 1 &&
-								currentNode == currentNode->connections()[0]) {
-							// Something terrible is happening
-							throw std::runtime_error("Caught network trap!");
+						if(currentNode->type() == ::model::network::node::type_t::qswitch) {
+							auto cnode = static_cast<model::network::qswitch*>(currentNode);
+							::model::network::node* temp = cnode->route(*lastNode);
+							lastNode = currentNode;
+							currentNode = temp;
+							continue;
 						}
 						
-						/** \fixme I don't think this is always true! */
-						if(currentNode->connections().size() == 1 &&
-								lastNode == currentNode->connections()[0]) {
-							// Reached an endpoint
-							endNode = currentNode;
-							break; // ==continue;
+						if(currentNode->connections().size() == 1) {
+							if(lastNode == currentNode->connections()[0]) {
+								// Reached an endpoint
+								endNode = currentNode;
+								break;
+							} else {
+								lastNode = currentNode;
+								currentNode = currentNode->connections()[0];
+								continue;
+							}
+						} else {
+							throw std::runtime_error("todo");
 						}
-						
-						// Probably some sort of switch
-						assert(currentNode->connections().size() > 1);
-						lastNode = currentNode;
-						currentNode = static_cast<model::network::qswitch*>(currentNode)->route(*lastNode);
 					} while(endNode == nullptr);
 					
 					// If the endpoint node type is null, we drop the transmission
