@@ -6,7 +6,7 @@ namespace network {
 	
 	node* node::factory::instantiate(const char* const name,
 			const node::id_t id) {
-		// Easier than manually writing a functor for using find? Yeah probably
+		// Easier than manually writing a functor for find? Yeah probably
 		for(auto it : _node_map) {
 			if(strcmp(name, it.first) == 0) return it.second(id);
 		}
@@ -22,7 +22,8 @@ namespace network {
 	node::node(const type_t type,
 			const id_t id)
 			: _type(type),
-			_id(id) {
+			_id(id),
+			_parent(default_parent) {
 		_children.reserve(children_default_size);
 		_connections.reserve(connections_default_size);
 	}
@@ -49,6 +50,18 @@ namespace network {
 		}
 	}
 	
+	node::id_t node::child_count() {
+		return _children.size();
+	}
+	
+	node::id_t node::recursive_child_count() {
+		id_t sum = _children.size();
+		for(auto child : _children) {
+			sum += child->recursive_child_count();
+		}
+		return sum;
+	}
+	
 	bool node::add_child(node& child) {
 		// Check if the node is already a child
 		const auto rc = get_child(child.id());
@@ -73,6 +86,18 @@ namespace network {
 	
 	bool node::is_child(const id_t child) {
 		return (get_child(child) != nullptr);
+	}
+	
+	std::uint_fast64_t node::connection_count() {
+		return _connections.size();
+	}
+	
+	std::uint_fast64_t node::recursive_connection_count() {
+		std::uint_fast64_t sum = _connections.size();
+		for(auto child : _children) {
+			sum += child->recursive_connection_count();
+		}
+		return sum;
 	}
 	
 	bool node::add_connection(node& other) {
@@ -139,6 +164,14 @@ namespace network {
 		);
 		if(it == _children.end()) return nullptr;
 		return *it;
+	}
+	
+	node* node::parent() {
+		return _parent;
+	}
+	
+	void node::set_parent(node* const parent) {
+		_parent = parent;
 	}
 }
 }

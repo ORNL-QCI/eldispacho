@@ -69,7 +69,22 @@ namespace network {
 		/**
 		 * \brief The node id type.
 		 */
-		typedef std::uint_fast64_t id_t;
+		using id_t = std::uint_fast64_t;
+		
+		/**
+		 * \brief The default parent for nodes.
+		 */
+		constexpr static node* const default_parent = nullptr;
+		
+		/**
+		 * \brief \todo
+		 */
+		using children_list_t = std::vector<node*>;
+		
+		/** 
+		 * \brief \todo
+		 */
+		using connections_list_t = std::vector<node*>;
 		
 		/**
 		 * \brief Constructor.
@@ -113,9 +128,7 @@ namespace network {
 		 * 
 		 * \todo Threadsafety.
 		 */
-		inline id_t child_count() {
-			return _children.size();
-		}
+		id_t child_count();
 		
 		/**
 		 * \brief The number of children related to this node.
@@ -124,13 +137,7 @@ namespace network {
 		 * 
 		 * \todo Threadsafety
 		 */
-		inline id_t recursive_child_count() {
-			id_t sum = _children.size();
-			for(auto child : _children) {
-				sum += child->recursive_child_count();
-			}
-			return sum;
-		}
+		id_t recursive_child_count();
 		
 		/**
 		 * \brief Add a child node to this node.
@@ -168,9 +175,19 @@ namespace network {
 		 * 
 		 * \todo Threadsafety.
 		 */
-		inline std::uint_fast64_t connection_count() {
-			return _connections.size();
-		}
+		std::uint_fast64_t connection_count();
+		
+		/**
+		 * \brief The number of connections to this node and all children.
+		 * 
+		 * \note Includes connections between children and other children, not
+		 * just the connections to nodes not related to this one.
+		 * 
+		 * \warning This has no depth limiting.
+		 * 
+		 * \todo Threadsafety
+		 */
+		std::uint_fast64_t recursive_connection_count();
 		
 		/**
 		 * \brief Add a connection between another node and this node.
@@ -198,6 +215,22 @@ namespace network {
 		 * \todo Threadsafety.
 		 */
 		bool is_connected(const id_t other);
+		
+		/**
+		 * \brief \todo
+		 * 
+		 * \todo Threadsafety.
+		 * 
+		 * \returns \todo
+		 */
+		node* parent();
+		
+		/**
+		 * \brief
+		 * 
+		 * \todo Threadsafety.
+		 */
+		void set_parent(node* const parent);
 		
 		/**
 		 * \brief Node factory that contains a list of all registered node types
@@ -270,7 +303,7 @@ namespace network {
 		 * 
 		 * \warning Does not enforce any threadsafety.
 		 */
-		inline std::vector<node*>& children() noexcept {
+		inline children_list_t& children() noexcept {
 			return _children;
 		}
 		
@@ -279,7 +312,7 @@ namespace network {
 		 * 
 		 * \warning Does not enforce any threadsafety.
 		 */
-		inline std::vector<node*>& connections() noexcept {
+		inline connections_list_t& connections() noexcept {
 			return _connections;
 		}
 		
@@ -319,18 +352,26 @@ namespace network {
 		id_t _id;
 		
 		/**
+		 * \brief The parent of the node.
+		 * 
+		 * If this pointer is not null, then the node to which it points shall
+		 * contain the current node in its list of children.
+		 */
+		node* _parent;
+		
+		/**
 		 * \brief List of children this node owns.
 		 * 
 		 * Upon destruction of this node, all children get destroyed.
 		 */
-		std::vector<node*> _children;
+		children_list_t _children;
 		
 		/**
 		 * \brief The connections to other nodes this node has.
 		 * 
 		 * Upon destruction of this node, all connections get destroyed.
 		 */
-		std::vector<node*> _connections;
+		connections_list_t _connections;
 		
 	};
 }
