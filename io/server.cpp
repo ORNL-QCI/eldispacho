@@ -1,6 +1,6 @@
 #include "server.hpp"
 
-namespace net {
+namespace io {
 	const int rpc_server::tx_receive_timeout = RPC_SERVER_TX_RECEIVE_TIMEOUT;
 	const int rpc_server::tx_send_timeout = RPC_SERVER_TX_SEND_TIMEOUT;
 	
@@ -27,8 +27,8 @@ namespace net {
 	
 	void rpc_server::listen(const std::size_t rxWorkerCount, 
 			const std::size_t txWorkerCount) {
-		if(UNLIKELY(rxWorkerCount > NET_SERVER_MAX_RX_THREADS ||
-				txWorkerCount > NET_SERVER_MAX_TX_THREADS)) {
+		if(UNLIKELY(rxWorkerCount > IO_SERVER_MAX_RX_THREADS ||
+				txWorkerCount > IO_SERVER_MAX_TX_THREADS)) {
 			throw std::runtime_error(err_msg::_arybnds);
 		}
 		

@@ -1,7 +1,7 @@
 #include <common.hpp>
 #include "diagnostics/server.hpp"
 #include "buffer.hpp"
-#include "net/server.hpp"
+#include "io/server.hpp"
 #include "processor.hpp"
 #include <csignal>
 #include <atomic>
@@ -118,7 +118,7 @@ int main(int argc, char *argv[]) {
 	worker.start(sabotClientThreadCount);
 	
 	// Client facing server
-	net::rpc_server frontend(context,
+	io::rpc_server frontend(context,
 							logger, 
 							worker,
 							rxServerEndpoint.c_str(), 

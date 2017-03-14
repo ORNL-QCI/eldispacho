@@ -1,12 +1,12 @@
-#ifndef _NET_RESPONSE_HPP
-#define _NET_RESPONSE_HPP
+#ifndef _IO_RESPONSE_HPP
+#define _IO_RESPONSE_HPP
 
 #include <common.hpp>
 #include <rapidjson/document.h>
 #include <rapidjson/memorybuffer.h>
 #include <rapidjson/writer.h>
 
-namespace net {
+namespace io {
 	/**
 	 * \brief A JSON reponse to a client.
 	 * 

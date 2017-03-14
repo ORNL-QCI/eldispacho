@@ -1,5 +1,5 @@
-#ifndef _NET_SERVER_HPP
-#define _NET_SERVER_HPP
+#ifndef _IO_SERVER_HPP
+#define _IO_SERVER_HPP
 
 #include <common.hpp>
 #include "../action.hpp"
@@ -15,12 +15,12 @@
 /**
  * \brief Maximum number of tx worker threads that can be launched.
  */
-#define NET_SERVER_MAX_TX_THREADS 16
+#define IO_SERVER_MAX_TX_THREADS 16
 
 /**
  * \brief Maximum number of rx worker threads that can be launched.
  */
-#define NET_SERVER_MAX_RX_THREADS 1
+#define IO_SERVER_MAX_RX_THREADS 1
 
 #define RPC_SERVER_RX_THREAD_WAIT_FOR 15 // milliseconds
 #define RPC_SERVER_RX_RECEIVE_TIMEOUT 100 // milliseconds
@@ -48,7 +48,7 @@
  */
 #define SERVER_ZMQ_CONTROL_LOCATION "inproc://control"
 
-namespace net {
+namespace io {
 	
 	/**
 	 * \brief An RPC server for interfacing with middleware
@@ -174,7 +174,7 @@ namespace net {
 		 * \brief An array of thread objects where each thread is a tx worker that is
 		 * processing requests.
 		 */
-		std::thread txWorkerThreads[NET_SERVER_MAX_TX_THREADS];
+		std::thread txWorkerThreads[IO_SERVER_MAX_TX_THREADS];
 		
 		/**
 		 * \brief The number of tx worker threads.

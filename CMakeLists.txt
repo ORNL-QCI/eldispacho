@@ -23,7 +23,7 @@ set(eldispacho_sources
 	model/network/parser.cpp
 	model/network/system.cpp
 	model/network/debugger.cpp
-	net/server.cpp
+	io/server.cpp
 	processor.cpp
 	diagnostics/logger.cpp
 	diagnostics/server.cpp

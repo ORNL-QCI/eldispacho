@@ -1,10 +1,10 @@
-#ifndef _NET_REQUEST_HPP
-#define _NET_REQUEST_HPP
+#ifndef _IO_REQUEST_HPP
+#define _IO_REQUEST_HPP
 
 #include <common.hpp>
 #include <rapidjson/document.h>
 
-namespace net {
+namespace io {
 	/**
 	 * \brief A JSON request from the client.
 	 * 
