@@ -207,7 +207,6 @@ namespace io {
 							requestMsg.data(),
 							requestMsg.size()-1);
 					
-					reply = new response(true);
 					//\todo: fix this up 
 					processor.incoming_buffer().push(processor.preprocess(action::configure_node,
 							ntohl(request.parameter<unsigned int>(0)),
