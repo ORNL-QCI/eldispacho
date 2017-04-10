@@ -198,7 +198,7 @@ void processor::work(const std::size_t id, ::simulator::client& client) {
 							std::string(receivingClient->get_detector().simulation_unit().description());
 					
 					auto measurement(simulator::compute_result(client,
-							1,
+							0,
 							simulator::unit(receivingClient->get_detector().simulation_unit().dialect(),
 							circuit.c_str(),
 							receivingClient->get_detector().simulation_unit().line_delimiter())));
